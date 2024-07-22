@@ -1,0 +1,6 @@
+train_src: /mnt/code/lsa_dat/model/spoc/config/spoc_v/data/train.tsv
+train_tgt: "-"
+valid_src: /mnt/code/lsa_dat/model/spoc/config/spoc_v/data/eval.tsv
+valid_tgt: "-"
+save_data: /mnt/code/lsa_dat/model/spoc/config/spoc_v/out/spoc_v
+dynamic_dict: true
