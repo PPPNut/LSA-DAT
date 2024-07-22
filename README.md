@@ -2,15 +2,6 @@
 
 Official implementation of "Balancing quality and efficiency: an improved non-autoregressive model for pseudocode-to-code conversion"
 
-## Abstract
-
-## Highlights
-
-- The NAR model is introduced for the first time in the pseudocode-to-code conversion task.
-- Given the limitations of current pseudocode datasets, this paper designs two data augmentation methods that significantly increase the performance of AR and NAR models.
-- To reduce the "winner takes all" impact of the NAR model, a linearly smoothed adaptive transition matrix is designed.
-- A synthesis potential metric is presented to simplify the synthesis success rate calculation procedure while reducing the link between the evaluation index and synthesis technique.
-
 ## Requirements & Installation
 
 ### Requirements
@@ -51,8 +42,8 @@ dataName=spoc
 # train
 input_dir=./data/spoc
 data_dir=./model/DA-Transformer/fairseq_data/${dataName}
-src=nl              
-tgt=code                   
+src=nl        
+tgt=code             
 fairseq-datpreprocess --source-lang ${src} --target-lang ${tgt} \
     --trainpref ${input_dir}/train --validpref ${input_dir}/eval --testpref ${input_dir}/test \
     --destdir ${data_dir} --workers 32  --joined-dictionary \
@@ -61,8 +52,8 @@ fairseq-datpreprocess --source-lang ${src} --target-lang ${tgt} \
 # testp
 input_dir=./data/spoc
 data_dir=./model/DA-Transformer/fairseq_data/${dataName}_w
-src=nl                          
-tgt=code                                                
+src=nl                    
+tgt=code                                          
 tgtdict=../fairseq_data/${dataName}/dict.code.txt
 srcdict=../fairseq_data/${dataName}/dict.nl.txt
 fairseq-preprocess --source-lang ${src} --target-lang ${tgt} \
@@ -74,8 +65,8 @@ fairseq-preprocess --source-lang ${src} --target-lang ${tgt} \
 # testw
 input_dir=./data/spoc
 data_dir=./model/DA-Transformer/fairseq_data/${dataName}_w
-src=nl                          
-tgt=code                                                
+src=nl                    
+tgt=code                                          
 tgtdict=../fairseq_data/${dataName}/dict.code.txt
 srcdict=../fairseq_data/${dataName}/dict.nl.txt
 fairseq-preprocess --source-lang ${src} --target-lang ${tgt} \
@@ -268,7 +259,6 @@ CUDA_VISIBLE_DEVICES=0 fairseq-train ${data_dir}  \
     `# Logging Configs` \
     --tensorboard-logdir ${tensorboard_dir} 
 ```
-
 
 # Code Evaluation Script
 
