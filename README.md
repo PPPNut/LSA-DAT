@@ -79,6 +79,8 @@ fairseq-preprocess --source-lang ${src} --target-lang ${tgt} \
 
 ## Training LSTM
 
+`--arch lstm`
+
 ```bash
 rootPath=./model/DA-Transformer
 modelName=spoc_lstm
@@ -104,6 +106,8 @@ CUDA_VISIBLE_DEVICES=1 fairseq-train ${data_dir} \
 ```
 
 ## Training Transformer
+
+`--arch transformer`
 
 ```bash
 rootPath=./model/DA-Transformer
@@ -133,69 +137,7 @@ CUDA_VISIBLE_DEVICES=0 fairseq-train ${data_dir} \
 
 ## Training DAT
 
-```bash
-rootPath=./model/DA-Transformer
-modelName=spoc_datattn
-
-data_dir=${rootPath}/data/spoc  
-checkpoint_dir=./model/checkpoint/${modelName} 
-tensorboard_dir=./model/tf-logs/${modelName}
-
-CUDA_VISIBLE_DEVICES=1 fairseq-train ${data_dir}  \
-    \
-    `# loading DA-Transformer plugins` \
-    --user-dir fs_plugins \
-    \
-    `# DA-Transformer Task Configs ` \
-    --task translation_dat_task \
-    --upsample-base source_old --upsample-scale 4 \
-    --filter-max-length 256:256 --filter-ratio 4 \
-    --encoder-layers 3 --decoder-layers 3 \
-    \
-    `# DA-Transformer Architecture Configs 这里的最大值需要调整` \
-    --arch glat_decomposed_link_no_base \
-    --links-feature feature:position \
-    --max-source-positions 256 --max-target-positions 256 \
-    --encoder-learned-pos --decoder-learned-pos \
-    --activation-fn gelu --apply-bert-init \
-    \
-    `# DA-Transformer Decoding Configs (See more in the decoding section) ` \
-    --decode-strategy lookahead --decode-upsample-scale 4.0 \
-    \
-    `# DA-Transformer Criterion Configs ` \
-    --criterion nat_dag_loss \
-    --length-loss-factor 0 --max-transition-length 99999 \
-    --glat-p 0.5:0.1@200k --glance-strategy number-random \
-    --no-force-emit \
-    \
-    `# Optimizer & Regularizer Configs ` \
-    --optimizer adam --adam-betas '(0.9,0.999)' --fp16 \
-    --label-smoothing 0.0 --weight-decay 0.01 --dropout 0.1 \
-    --lr-scheduler inverse_sqrt  --warmup-updates 6000   \
-    --clip-norm 0.1 --lr 0.0005 --warmup-init-lr '1e-07' --stop-min-lr '1e-09' \
-    \
-    `# Training Configs 4096 ` \
-    --max-tokens 8196  --max-tokens-valid 4096 --update-freq 2 \
-    --max-update 300000  --grouped-shuffling \
-    --max-encoder-batch-tokens 15000 --max-decoder-batch-tokens 15000 \
-    --seed 0 --ddp-backend c10d --required-batch-size-multiple 1 \
-    \
-    `# Validation Configs` \
-    --valid-subset valid \
-    --validate-interval 1 --validate-interval-updates 2048 \
-    --eval-bleu --eval-bleu-detok space --eval-bleu-remove-bpe --eval-bleu-print-samples --eval-tokenized-bleu \
-    --fixed-validation-seed 7 \
-    \
-    `# Checkpoint Configs` \
-    --best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
-    --save-interval 1  --save-interval-updates 10000  --keep-last-epochs 5 \
-    --keep-best-checkpoints 5 --save-dir ${checkpoint_dir} \
-    \
-    `# Logging Configs` \
-    --tensorboard-logdir ${tensorboard_dir} 
-```
-
-## Training DAT
+`--arch glat_decomposed_link_base`
 
 ```bash
 rootPath=./model/DA-Transformer
@@ -254,6 +196,72 @@ CUDA_VISIBLE_DEVICES=0 fairseq-train ${data_dir}  \
     --best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
     --save-interval 1  --save-interval-updates 10000  --keep-last-epochs 5 \
     --device-id 0 --distributed-rank 0 --device-id 0 --distributed-world-size 1 --distributed-num-procs 1\
+    --keep-best-checkpoints 5 --save-dir ${checkpoint_dir} \
+    \
+    `# Logging Configs` \
+    --tensorboard-logdir ${tensorboard_dir} 
+```
+
+## Training LSA-DAT
+
+`--arch glat_decomposed_link_no_base`
+
+```bash
+rootPath=./model/DA-Transformer
+modelName=spoc_datattn
+
+data_dir=${rootPath}/data/spoc  
+checkpoint_dir=./model/checkpoint/${modelName} 
+tensorboard_dir=./model/tf-logs/${modelName}
+
+CUDA_VISIBLE_DEVICES=1 fairseq-train ${data_dir}  \
+    \
+    `# loading DA-Transformer plugins` \
+    --user-dir fs_plugins \
+    \
+    `# DA-Transformer Task Configs ` \
+    --task translation_dat_task \
+    --upsample-base source_old --upsample-scale 4 \
+    --filter-max-length 256:256 --filter-ratio 4 \
+    --encoder-layers 3 --decoder-layers 3 \
+    \
+    `# DA-Transformer Architecture Configs 这里的最大值需要调整` \
+    --arch glat_decomposed_link_no_base \
+    --links-feature feature:position \
+    --max-source-positions 256 --max-target-positions 256 \
+    --encoder-learned-pos --decoder-learned-pos \
+    --activation-fn gelu --apply-bert-init \
+    \
+    `# DA-Transformer Decoding Configs (See more in the decoding section) ` \
+    --decode-strategy lookahead --decode-upsample-scale 4.0 \
+    \
+    `# DA-Transformer Criterion Configs ` \
+    --criterion nat_dag_loss \
+    --length-loss-factor 0 --max-transition-length 99999 \
+    --glat-p 0.5:0.1@200k --glance-strategy number-random \
+    --no-force-emit \
+    \
+    `# Optimizer & Regularizer Configs ` \
+    --optimizer adam --adam-betas '(0.9,0.999)' --fp16 \
+    --label-smoothing 0.0 --weight-decay 0.01 --dropout 0.1 \
+    --lr-scheduler inverse_sqrt  --warmup-updates 6000   \
+    --clip-norm 0.1 --lr 0.0005 --warmup-init-lr '1e-07' --stop-min-lr '1e-09' \
+    \
+    `# Training Configs 4096 ` \
+    --max-tokens 8196  --max-tokens-valid 4096 --update-freq 2 \
+    --max-update 300000  --grouped-shuffling \
+    --max-encoder-batch-tokens 15000 --max-decoder-batch-tokens 15000 \
+    --seed 0 --ddp-backend c10d --required-batch-size-multiple 1 \
+    \
+    `# Validation Configs` \
+    --valid-subset valid \
+    --validate-interval 1 --validate-interval-updates 2048 \
+    --eval-bleu --eval-bleu-detok space --eval-bleu-remove-bpe --eval-bleu-print-samples --eval-tokenized-bleu \
+    --fixed-validation-seed 7 \
+    \
+    `# Checkpoint Configs` \
+    --best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
+    --save-interval 1  --save-interval-updates 10000  --keep-last-epochs 5 \
     --keep-best-checkpoints 5 --save-dir ${checkpoint_dir} \
     \
     `# Logging Configs` \
