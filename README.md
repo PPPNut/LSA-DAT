@@ -270,6 +270,8 @@ CUDA_VISIBLE_DEVICES=1 fairseq-train ${data_dir}  \
 
 # Code Evaluation Script
 
+`/stitch/main.py`
+
 This script evaluates the functionality and compilation success of code translations using various metrics. It supports multiple modes and options for flexible testing.
 
 ## Usage
